@@ -18,8 +18,10 @@ namespace Fanatec_Pedal_Adapter
         private const double GAS_MAX = 4095.0;
         private const double BRAKE_MAX = 4095.0;
         private const double CLUTCH_MAX = 4095.0;
+        private const double HANDBRAKE_MAX = 4095.0;
+        // Offset to apply to the bottom values and range
+        private const double TRIM_PADDING = 95.0;
 
-        private static bool INVERT_VALUES = false;
         private const int UPDATE_MS = 1;
         private const int RETRY_MS = 500;
 
@@ -28,11 +30,18 @@ namespace Fanatec_Pedal_Adapter
         private Joystick joystick = null;
         private JoystickState state = null;
 
+        public bool EnableHandbrake { get; set; }
+        public bool InvertValues
+        {
+            get; set;
+        }
+
         private bool processThread = false;
 
         public FanatecPedals()
         {
-            
+            EnableHandbrake = false;
+            InvertValues = false;
         }
 
         public void StartProcessingThread()
@@ -54,7 +63,14 @@ namespace Fanatec_Pedal_Adapter
                             joystick.GetCurrentState(ref state);
                             gas = mapInt(state.X, GAS_MAX);
                             brake = mapInt(state.Y, BRAKE_MAX);
-                            clutch = mapInt(state.Z, CLUTCH_MAX);
+                            if (EnableHandbrake)
+                            {
+                                clutch = mapInt(state.RotationX, HANDBRAKE_MAX);
+                            }
+                            else
+                            {
+                                clutch = mapInt(state.Z, CLUTCH_MAX);
+                            }
                             byte[] data = { gas[0], gas[1], brake[0], brake[1], clutch[0], clutch[1] };
                             Program.Arduino.Send(data);
                             Thread.Sleep(UPDATE_MS);
@@ -114,6 +130,7 @@ namespace Fanatec_Pedal_Adapter
                     {
                         Console.WriteLine("Found Pedals: " + name);
                         joystickGuid = deviceInstance.InstanceGuid;
+                        break;
                     }
                 }
 
@@ -126,6 +143,8 @@ namespace Fanatec_Pedal_Adapter
                 state = new JoystickState();
                 joystick.Properties.AxisMode = DeviceAxisMode.Absolute;
                 joystick.Acquire();
+
+                Console.WriteLine("Connected to pedals!");
                 return true;
             }
             catch
@@ -143,21 +162,22 @@ namespace Fanatec_Pedal_Adapter
             return false;
         }
 
-        static byte[] mapByte(int value, double newMax)
+        private byte[] mapByte(int value, double newMax)
         {
-            if (INVERT_VALUES)
+            if (InvertValues)
             {
                 return new byte[] { (byte)(newMax - Math.Round((value / 65535.0) * newMax)) };
             }
-            else {
+            else
+            {
                 return new byte[] { (byte)(Math.Round((value / 65535.0) * newMax)) };
             }
         }
 
-        static byte[] mapInt(int value, double newMax)
+        private byte[] mapInt(int value, double newMax)
         {
-            int val = (int)Math.Round((value / 65535.0) * newMax);
-            if (INVERT_VALUES)
+            int val = (int)Math.Round((value / 65535.0) * (newMax - TRIM_PADDING) + TRIM_PADDING);
+            if (InvertValues)
             {
                 val = (int)newMax - val;
             }

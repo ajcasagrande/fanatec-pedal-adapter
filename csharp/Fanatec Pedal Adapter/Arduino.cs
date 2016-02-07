@@ -15,8 +15,8 @@ namespace Fanatec_Pedal_Adapter
         private const string START_COMMAND = "^START$\n";
 
         private SerialPort serialPort1 = null;
-        private string serialPort;
-        private int baudRate;
+        public string serialPort { get; private set; }
+        public int baudRate { get; private set; }
 
         public Arduino(string serialPort, int baudRate)
         {
@@ -49,6 +49,15 @@ namespace Fanatec_Pedal_Adapter
                 serialPort1 = null;
                 return false;
             }
+        }
+
+        public void Disconnect()
+        {
+            try
+            {
+                serialPort1.Close();
+            }
+            catch { }
         }
 
         public bool IsConnected()
