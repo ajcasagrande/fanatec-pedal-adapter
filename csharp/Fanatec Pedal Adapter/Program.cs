@@ -21,7 +21,7 @@ namespace Fanatec_Pedal_Adapter
 
         static void Main(string[] args)
         {
-            Arduino = new Arduino("COM9", BAUD_RATE);
+            Arduino = new Arduino("COM3", BAUD_RATE);
             Arduino.Connect();
 
             FanatecPedals pedals = new FanatecPedals();
