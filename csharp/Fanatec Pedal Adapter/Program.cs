@@ -21,7 +21,7 @@ namespace Fanatec_Pedal_Adapter
 
         static void Main(string[] args)
         {
-            Arduino = new Arduino("COM9", BAUD_RATE);
+            Arduino = new Arduino("COM3", BAUD_RATE);
             Arduino.Connect();
 
             FanatecPedals pedals = new FanatecPedals();
@@ -49,7 +49,7 @@ namespace Fanatec_Pedal_Adapter
                             string param = tokens[1].ToLower();
                             bool enable = param == "on" || param == "enable";
                             pedals.EnableHandbrake = enable;
-                            Console.WriteLine("Success");
+                            Console.WriteLine("Success: Handbrake {0}", pedals.EnableHandbrake);
                             break;
                         case "save":
                             // TODO: Save the state for next time
@@ -59,6 +59,9 @@ namespace Fanatec_Pedal_Adapter
                                 Arduino.IsConnected(), Arduino.serialPort, Arduino.baudRate);
                             Console.WriteLine("Pedals -- Connected: {0}, Handbrake: {1}", pedals.IsConnected(), pedals.EnableHandbrake);
                             break;
+                        case "help":
+                            PrintHelp();
+                            break;
                         default:
                             Console.WriteLine("Error, unrecognized command!");
                             break;
@@ -66,6 +69,16 @@ namespace Fanatec_Pedal_Adapter
                 }
                 catch { }
             }
+        }
+
+        static void PrintHelp()
+        {
+            Console.WriteLine("\nCommands\n");
+            Console.WriteLine("port PORT_NAME \t\t Set the arduino port");
+            Console.WriteLine("hb [on/off] \t\t Enable or disable the handbrake (over clutch pin)");
+            Console.WriteLine("status \t\t\t Print the connected status of Arduino and Pedals");
+            Console.WriteLine("help \t\t\t Print this help messgae");
+            Console.WriteLine("");
         }
     }
 }
