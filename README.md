@@ -1,0 +1,1 @@
+Software for a simple adapter that allows for the Fanatec Clubsport V3 Pedals to be used on a computer via USB, and the inputs routed to an arduino board with a DAC to convert the signal into one compatible with the Thrustmaster T300 Wheel Base.

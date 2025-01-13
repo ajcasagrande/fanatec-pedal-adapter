@@ -77,7 +77,7 @@ namespace Fanatec_Pedal_Adapter
             Console.WriteLine("port PORT_NAME \t\t Set the arduino port");
             Console.WriteLine("hb [on/off] \t\t Enable or disable the handbrake (over clutch pin)");
             Console.WriteLine("status \t\t\t Print the connected status of Arduino and Pedals");
-            Console.WriteLine("help \t\t\t Print this help messgae");
+            Console.WriteLine("help \t\t\t Print this help message");
             Console.WriteLine("");
         }
     }
